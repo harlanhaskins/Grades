@@ -37,9 +37,12 @@ struct CSGrade: ClassGrade {
 If your class has any more specific logic, such as the final replacing
 a test score or anything, just perform those changes inside `withFinal(_:)`.
 
+Otherwise, if your class has no specific logic, then you can represent it
+with an instance of `AnyClassGrade`, which performs simple averaging.
+
 # Example
 
-There's an example Economics class grade in the tests folder.
+There are example Economics and Spanish class grades in the tests folder.
 
 # Author
 

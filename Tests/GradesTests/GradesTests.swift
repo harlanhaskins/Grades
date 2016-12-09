@@ -18,7 +18,26 @@ struct EconomicsGrade: ClassGrade {
   }
 
   func withFinal(_ final: Assignment) -> EconomicsGrade {
-    return EconomicsGrade(quizzes: quizzes, tests: tests, final: final)
+    // The professor drops the lowest quiz score and replaces the lowest test
+    // with the final if the final is higher
+    
+    let minQuizIndex = quizzes.enumerated().min {
+        $0.element.percentage < $1.element.percentage
+    }!.offset
+    
+    let minTestIndex = tests.enumerated().min {
+        $0.element.percentage < $1.element.percentage
+    }!.offset
+    
+    var newQuizzes = quizzes
+    newQuizzes.remove(at: minQuizIndex)
+    
+    var newTests = tests
+    if newTests[minTestIndex].percentage < final.percentage {
+        newTests[minTestIndex] = final
+    }
+    
+    return EconomicsGrade(quizzes: newQuizzes, tests: newTests, final: final)
   }
 }
 
@@ -51,7 +70,7 @@ extension ClassGrade {
 }
 
 class GradesTests: XCTestCase {
-    func testExample() {
+    func testSpecialClass() {
         let econ = EconomicsGrade(quizzes: [
             Assignment(points: 50, total: 50),
             Assignment(points: 44, total: 50),
@@ -64,13 +83,31 @@ class GradesTests: XCTestCase {
         let dist = econ.finalDistribution()
         econ.printStanding()
         XCTAssertEqual(dist[.a], nil)
-        XCTAssertEqualWithAccuracy(dist[.c]!, 80.0, accuracy: 0.1)
+        XCTAssertEqualWithAccuracy(dist[.c]!, 45, accuracy: 0.1)
         print(dist)
     }
+    
+    func testNormalClass() {
+        let spanish = AnyClassGrade(className: "Spanish 204",
+                                    finalWeight: 0.35,
+                                    weightedAssignments: [
+                                        Assignment(points: 10, total: 10).weighted(by: 0.2),
+                                        Assignment(points: 6, total: 10).weighted(by: 0.2),
+                                        Assignment(points: 8, total: 10).weighted(by: 0.2),
+                                        Assignment(points: 10, total: 10).weighted(by: 0.05),
+                                    ], final: nil)
+        let dist = spanish.finalDistribution()
+        spanish.printStanding()
+        XCTAssertNotNil(dist[.a])
+        XCTAssertNotNil(dist[.b])
+        XCTAssertEqualWithAccuracy(dist[.a]!, 96.0, accuracy: 0.01)
+        XCTAssertEqualWithAccuracy(dist[.b]!, 84.0, accuracy: 0.01)
+    }
+    
 
     static var allTests : [(String, (GradesTests) -> () throws -> Void)] {
         return [
-            ("testExample", testExample),
+            ("testSpecialClass", testSpecialClass),
         ]
     }
 }
