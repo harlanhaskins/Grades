@@ -17,9 +17,9 @@ struct CSGrade: ClassGrade {
   let homework: [Assignment]
   let final: Assignment?
 
-  var assignments: [Assignment {
+  var assignments: [Assignment] {
     var all = tests.map { $0.weighted(by: 0.2) } +
-              homework.map { $0.weighted(by: 0.1 }
+              homework.map { $0.weighted(by: 0.1) }
     if let final = final {
       all.append(final)
     }
